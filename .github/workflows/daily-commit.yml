@@ -1,24 +1,28 @@
-name: Daily Commit Workflow
+name: Daily Commit
 
 on:
   schedule:
-    - cron: '30 18 * * *'  # Runs at 18:30 UTC daily
+    - cron: '15 4 * * *'   # Runs at 04:15 UTC daily
   workflow_dispatch:
 
 jobs:
-  daily-commit:
+  commit:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Configure Git
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Commit step - 21f3002256@ds.study.iitm.ac.in
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-      - name: Step with email 21f3002256@ds.study.iitm.ac.in
-        run: echo "This step includes the email 21f3002256@ds.study.iitm.ac.in in its name."
-      - name: Create a commit
+          echo "TDSFU Daily run: $(date -u) TDSFU" >> daily-log.txt
+
+      - name: Git Commit and Push
         run: |
-          echo "Daily commit by GitHub Actions" >> daily_commit.txt
-          git add daily_commit.txt
-          git commit -m "Daily commit by GitHub Actions"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add daily-log.txt
+          git commit -m "Auto commit at $(date -u)" || echo "No changes to commit"
+          git pull --rebase
           git push
